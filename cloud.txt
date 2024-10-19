@@ -1,3 +1,4 @@
+HADOOP:
 sudo apt update
 sudo apt install openjdk-8-jdk -y
 sudo rm /var/lib/dpkg/lock-frontend
@@ -161,9 +162,9 @@ hdfs dfs -put input.txt /user/input/
 hadoop jar helloworld.jar HelloWorld /user/input /user/output
 hdfs dfs -cat /user/output/part-r-00000
 
-
 ------
 
+SPARK:
 java -version
 sudo rm /var/lib/dpkg/lock-frontend
 sudo rm /var/lib/dpkg/lock
@@ -190,9 +191,9 @@ counts.saveAsTextFile("output")
 cd output
 cat part-00000
 
-
 -----
 
+DOCKER:
 sudo apt update
 docker --version
 sudo usermod -aG docker $USER
@@ -243,50 +244,48 @@ sudo docker rm 1715ff1beeb5
 ---
 
 OPENMPI:
+sudo apt-get install libopenmpi-dev
+sudo apt-get install openmpi-bin
 
-install-sudo apt-get install libopenmpi-dev;  sudo apt-get install openmpi-bin
-
-PROGRAM:
 #include <stdio.h>
 #include <omp.h>
-int main()
-{
-int sum=0;
-int i;
-#pragma omp parallel
-{
-int localsum=0;
-#pragma omp for
-for(i=0;i<10;i++)
-{
-localsum+=i;
+int main() {
+  int sum=0;
+  int i;
+  #pragma omp parallel
+  {
+    int localsum=0;
+    #pragma omp for
+    for(i=0;i<10;i++) {
+      localsum+=i;
+    }
+    #pragma omp critical
+    sum+=localsum;
+  }
+  }
+  printf("%d",sum);
+  return 0;
 }
-#pragma omp critical
-sum+=localsum;
-}}
-printf("%d",sum);
-return 0;
-}
-
 COMPILE: gcc -fopenmp hello_world.c -o hello_world.out
 RUN: ./hello_world.out
 
+-----
+        
 MPICH:
-
 program:
 #include<stdio.h>
 #include<mpi.h>
 int main(int argv,char ** argc){
-int rank,size;
-{
-MPI_Init(NULL,NULL);
-MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-MPI_Comm_size(MPI_COMM_WORLD,&size);
-MPI_Finalize();
-printf("HELLO WORLD FROM %d OUT OF TOTAL PROCESDS %d\n",rank,size);
-}
-printf("program ends");
-return 0;
+  int rank,size;
+  {
+    MPI_Init(NULL,NULL);
+    MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+    MPI_Comm_size(MPI_COMM_WORLD,&size);
+    MPI_Finalize();
+    printf("HELLO WORLD FROM %d OUT OF TOTAL PROCESDS %d\n",rank,size);
+  }
+  printf("program ends");
+  return 0;
 }
 
 COMPILE: mpicc hello.c -o hello
